@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,8 +19,10 @@
             color: #212529;
             display: flex;
             flex-direction: column;
-            height: 100vh; /* 전체 화면 높이 고정 */
-            overflow: hidden; /* 바깥 스크롤 방지 */
+            height: 100vh;
+            /* 전체 화면 높이 고정 */
+            overflow: hidden;
+            /* 바깥 스크롤 방지 */
         }
 
         /* 메인 콘텐츠 영역 (프로젝트가 꽉 차게 들어감) */
@@ -49,11 +52,11 @@
 
         .intro-placeholder p {
             font-size: 1.1rem;
-            color: black;
+            color: #666666;
         }
 
-        /* Object 태그 스타일 */
-        object {
+        /* iframe 태그 스타일 (안정적인 화면 전환을 위해 object에서 변경) */
+        iframe {
             width: 100%;
             height: 100%;
             border: none;
@@ -61,7 +64,8 @@
             top: 0;
             left: 0;
             z-index: 2;
-            display: none; /* 초기에는 숨김 */
+            display: none;
+            /* 초기에는 숨김 */
             background-color: #ffffff;
         }
 
@@ -92,27 +96,29 @@
             text-align: center;
         }
 
-      
         .menu-btn.active {
             background-color: black;
             color: white;
+            border-color: black;
         }
     </style>
 </head>
+
 <body>
 
     <main>
         <div id="placeholder" class="intro-placeholder">
             <h1>devToxa.github.io</h1>
+            <p>아래 메뉴를 선택하여 프로젝트를 확인하세요.</p>
         </div>
 
-        <object id="project-viewer" type="text/html" data=""></object>
+        <iframe id="project-viewer" src=""></iframe>
     </main>
 
     <nav>
         <button class="menu-btn active" onclick="loadProject('home', this)">HOME</button>
-        <button class="menu-btn" onclick="loadProject('/html', this)">HTML</button>
-        <button class="menu-btn" onclick="loadProject('/react.js', this)">REACT.JS</button>
+        <button class="menu-btn" onclick="loadProject('https://devtoxa.github.io/html/', this)">HTML</button>
+        <button class="menu-btn" onclick="loadProject('https://devtoxa.github.io/react.js/', this)">REACT.JS</button>
     </nav>
 
     <script>
@@ -128,10 +134,10 @@
             // 2. 홈 버튼 클릭 시와 일반 프로젝트 버튼 클릭 시 분기 처리
             if (url === 'home') {
                 viewer.style.display = 'none';
-                viewer.data = ''; // 데이터 초기화
+                viewer.src = ''; // 주소 초기화
                 placeholder.style.display = 'block'; // 안내문구 표시
             } else {
-                viewer.data = url;
+                viewer.src = url; // iframe 주소 삽입 (페이지 불러오기)
                 viewer.style.display = 'block'; // 뷰어 표시
                 placeholder.style.display = 'none'; // 안내문구 숨김
             }
@@ -139,4 +145,5 @@
     </script>
 
 </body>
+
 </html>

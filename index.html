@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DevToxa Dashboard</title>
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --footer-height: 70px;
+            --bg: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            height: 100dvh;
+            overflow: hidden;
+            background: var(--bg);
+        }
+
+        /* 사이드바 스타일 정의 */
+        aside {
+            width: var(--sidebar-width);
+            border-right: 1px solid #e2e8f0;
+            background: white;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .menu-item {
+            padding: 0.8rem;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #475569;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .menu-item:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .menu-item.active {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        /* 메인 영역 스타일 정의 */
+        main {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #viewer-area {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .home-content {
+            padding: 3rem;
+            color: #334155;
+        }
+
+        /* 모바일 전용 footer 스타일 정의 */
+        footer {
+            height: var(--footer-height);
+            border-top: 1px solid #e2e8f0;
+            background: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0 1rem;
+        }
+
+        #mobile-selector {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            aside {
+                display: none;
+            }
+
+            footer {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside id="sidebar">
+        <h2 style="margin-bottom: 2rem; letter-spacing: -1px;">DevToxa</h2>
+        <div id="sidebar-menu"></div>
+    </aside>
+
+    <main>
+        <div id="viewer-area">
+            <div id="home-view" class="home-content">
+                <h1>Welcome to DevToxa</h1>
+                <p style="margin-top: 1rem;">왼쪽 메뉴나 하단 선택창을 통해 프로젝트를 확인하세요.</p>
+            </div>
+            <iframe id="project-viewer" style="display:none;"></iframe>
+        </div>
+
+        <footer>
+            <select id="mobile-selector" onchange="loadProject(this.value)">
+                <option value="home">메뉴를 선택하세요</option>
+            </select>
+        </footer>
+    </main>
+
+    <script>
+        const projects = [
+            { name: 'HTML', icon: '📄', url: 'https://devtoxa.github.io/html/' },
+            { name: 'CSS', icon: '🎨', url: 'https://devtoxa.github.io/css/' },
+            { name: 'REACT.JS', icon: '⚛️', url: 'https://devtoxa.github.io/react.js/' },
+            { name: 'SPRING', icon: '🌱', url: 'https://devtoxa.github.io/spring/' },
+            { name: 'NODE.JS', icon: '🟢', url: 'https://devtoxa.github.io/node.js/' },
+            { name: 'JAVA', icon: '☕', url: 'https://devtoxa.github.io/java' },
+            { name: 'PYTHON', icon: '🐍', url: 'https://devtoxa.github.io/python' },
+            { name: 'MUSIC', icon: '🎶', url: 'https://devtoxa.github.io/music' },
+            { name: 'ETC', icon: '📄', url: 'https://devtoxa.github.io/etc' }
+        ];
+
+        const sideMenu = document.getElementById('sidebar-menu');
+        const mobileSelect = document.getElementById('mobile-selector');
+        const viewer = document.getElementById('project-viewer');
+        const homeView = document.getElementById('home-view');
+
+        projects.forEach(p => {
+            // 사이드바 생성
+            const div = document.createElement('div');
+            div.className = 'menu-item';
+            div.innerHTML = `<span>${p.icon}</span> ${p.name}`;
+            div.onclick = () => loadProject(p.url, div);
+            sideMenu.appendChild(div);
+
+            // 콤보박스 생성
+            const opt = document.createElement('option');
+            opt.value = p.url;
+            opt.textContent = p.name;
+            mobileSelect.appendChild(opt);
+        });
+
+        function loadProject(url, element) {
+            // 모바일 셀렉터 동기화
+            mobileSelect.value = url;
+
+            // 사이드바 active 상태 갱신
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            if (element) {
+                element.classList.add('active');
+            } else {
+                // 모바일에서 선택했을 경우 일치하는 메뉴 아이템 찾기
+                const items = document.querySelectorAll('.menu-item');
+                projects.forEach((p, idx) => {
+                    if (p.url === url && items[idx]) {
+                        items[idx].classList.add('active');
+                    }
+                });
+            }
+
+            if (url === 'home') {
+                homeView.style.display = 'block';
+                viewer.style.display = 'none';
+            } else {
+                homeView.style.display = 'none';
+                viewer.style.display = 'block';
+
+                // PDF 파일인 경우 모바일 가독성을 위해 FitH 파라미터 강제 추가
+                const targetUrl = url.endsWith('.pdf') ? url + '#view=FitH' : url;
+                viewer.src = targetUrl;
+            }
+        }
+    </script>
+</body>
+
+</html>
